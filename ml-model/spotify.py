@@ -68,8 +68,10 @@ def save_data(path:str = "data\\feats.json", data:dict = {}):
         with open(path,"w") as f:
             json.dump(current_data, f, indent=4)
         return True
-    except:
+    except Exception as e:
+        print(e)
         return False
+    
 
 token = get_token()
 
@@ -84,9 +86,11 @@ with open("data\\feats.json") as f:
         dictionary = d
         print(f"Caricati {len(dictionary)} elementi dal file")
 
+i=0
 with alive_bar(len(df["track_id"])) as bar:
     for track_id,track_name,artist_name in zip(df["track_id"], df["track_name"],df["artist_name"]):
-        if track_id not in dictionary.keys():
+        i += 1
+        if track_id not in d.keys():
             try:
                 feats = get_feat(track_name, token, track_id)
                 dictionary[track_id] = feats
@@ -97,7 +101,8 @@ with alive_bar(len(df["track_id"])) as bar:
                     break
                 if KeyboardInterrupt:
                     break
-        if len(dictionary.keys()) > 1000:
+        if i%100 == 0:
+            i=0
             if save_data(data=dictionary):
                 dictionary = {}
             else:
