@@ -5,6 +5,9 @@ import dotenv
 import os
 import pandas as pd
 from tqdm import tqdm
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+from nltk.corpus import stopwords
 
 dotenv.load_dotenv()
 
@@ -31,14 +34,51 @@ def get_token():
 def get_auth_header(token):
     return {"Authorization": f"Bearer {token}"}
 
-def get_feat(track_name, token):
-    track_name = track_name.replace(" ", "%20")
-    url = f"https://api.spotify.com/v1/search?q={track_name}&type=track&limit=1"
+def controlla_proposte_simili(descrizione1,descrizone2):
+    stop_words = stopwords.words('italian')
+    vectorizer = CountVectorizer(stop_words=stop_words)
+    vectorizer.fit([descrizione1,descrizone2])
+    vector = vectorizer.transform([descrizione1,descrizone2])
+    return cosine_similarity(vector)[0][1]
+
+def get_feat(track_name, token,track_id):
+    url = f"https://api.spotify.com/v1/search?q={track_name}&type=track&limit=10"
     result = requests.get(url, headers=get_auth_header(token))
     json_result = json.loads(result.content)
     feat = []
-    for artist in json_result["tracks"]["items"][0]["artists"][1:]:
-        feat.append(artist["name"])
+    
+    for item in json_result["tracks"]["items"]:
+        
+        if item["id"] == track_id:
+            # print("--------------------------------------------------")
+            # print(controlla_proposte_simili(item["name"].lower(),track_name.lower()), sep="|")
+            # print(item["name"].lower(),track_name.lower(), sep="|")
+            # print(item["artists"][0]["name"].lower(),artist_name.lower(), sep="|")
+            # print("ID")
+            for artist in item["artists"][1:]:
+                feat.append(artist["name"])
+            return feat
+        elif controlla_proposte_simili(item["name"].lower(),track_name.lower())>0.9 and item["artists"][0]["name"].lower() == artist_name.lower():
+            # print("--------------------------------------------------")
+            # print(controlla_proposte_simili(item["name"].lower(),track_name.lower()), sep="|")
+            # print(item["name"].lower(),track_name.lower(), sep="|")
+            # print(item["artists"][0]["name"].lower(),artist_name.lower(), sep="|")
+            # print("SIMILI")
+            for artist in item["artists"][1:]:
+                feat.append(artist["name"])
+            return feat
+        elif " feat" in track_name.lower() or " (feat" in track_name.lower():
+            # print("--------------------------------------------------")
+            # print(controlla_proposte_simili(item["name"].lower(),track_name.lower()), sep="|")
+            # print(item["name"].lower(),track_name.lower(), sep="|")
+            # print(item["artists"][0]["name"].lower(),artist_name.lower(), sep="|")
+            # print("FEAT")
+            return ["feat"]
+    # print("--------------------------------------------------")
+    # print(controlla_proposte_simili(item["name"].lower(),track_name.lower()), sep="|")
+    # print(item["name"].lower(),track_name.lower(), sep="|")
+    # print(item["artists"][0]["name"].lower(),artist_name.lower(), sep="|")
+    # print("VUOTO")
     return feat
 
 token = get_token()
@@ -52,9 +92,10 @@ with open("data\\feats.json") as f:
     d = json.load(f)
     df = df[~df['track_id'].isin(d)]
 
-    for track_id,track_name in tqdm(zip(df["track_id"], df["track_name"]), total=len(df)):
+    for track_id,track_name,artist_name in tqdm(zip(df["track_id"], df["track_name"],df["artist_name"]), total=len(df)):
+
         try:
-            feats = get_feat(track_name, token)
+            feats = get_feat(track_name, token, track_id)
             dictionary[track_id] = feats
         except:
             with open ("data\\feats.json","w") as f:
