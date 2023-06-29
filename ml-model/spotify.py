@@ -3,6 +3,8 @@ import requests
 import json
 import dotenv
 import os
+import pandas as pd
+from tqdm import tqdm
 
 dotenv.load_dotenv()
 
@@ -38,3 +40,25 @@ def get_feat(track_name, token):
     for artist in json_result["tracks"]["items"][0]["artists"][1:]:
         feat.append(artist["name"])
     return feat
+
+token = get_token()
+
+df = pd.read_csv("data\\SpotifySongPolularityAPIExtract.csv")
+
+dictionary = {}
+
+with open("data\\feats_url.json") as f:
+    d = json.load(f)
+    df = df[~df['track_name'].isin(d)]
+
+    for track in tqdm(df["track_name"]):
+        if track not in d:
+            try:
+                feats = get_feat(track, token)
+
+                dictionary[track] = feats
+            except:
+                with open ("data\\feats_url.json","w") as f:
+                    json.dump(dictionary, f, indent=4)
+                if KeyboardInterrupt:
+                    break
