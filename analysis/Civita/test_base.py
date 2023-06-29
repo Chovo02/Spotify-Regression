@@ -16,6 +16,6 @@ y_hat = []
 for X in X_train:
     y_hat.append(df_group[X])
 
-print(f"MSQ: {mean_squared_error(y_train, y_hat)}")
+print(f"MSE: {mean_squared_error(y_train, y_hat)}")
 print(f"RMSE: {np.sqrt(mean_squared_error(y_train, y_hat))}")
 print(f"MAE: {mean_absolute_error(y_train, y_hat)}")
