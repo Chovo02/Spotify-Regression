@@ -44,21 +44,20 @@ def get_feat(track_name, token):
 token = get_token()
 
 df = pd.read_csv("data\\SpotifySongPolularityAPIExtract.csv")
+df.drop_duplicates(subset=['track_id'], keep='first', inplace=True)
 
 dictionary = {}
 
 with open("data\\feats.json") as f:
     d = json.load(f)
-    df = df[~df['track_name'].isin(d)]
+    df = df[~df['track_id'].isin(d)]
 
-    for track in tqdm(df["track_name"]):
-        if track not in d:
-            try:
-                feats = get_feat(track, token)
-
-                dictionary[track] = feats
-            except:
-                with open ("data\\feats.json","w") as f:
-                    json.dump(dictionary, f, indent=4)
-                if KeyboardInterrupt:
-                    break
+    for track_id,track_name in tqdm(zip(df["track_id"], df["track_name"]), total=len(df)):
+        try:
+            feats = get_feat(track_name, token)
+            dictionary[track_id] = feats
+        except:
+            with open ("data\\feats.json","w") as f:
+                json.dump(dictionary, f, indent=4)
+            if KeyboardInterrupt:
+                break
