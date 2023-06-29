@@ -30,6 +30,7 @@ def get_auth_header(token):
     return {"Authorization": f"Bearer {token}"}
 
 def get_feat(track_name, token):
+    track_name = track_name.replace(" ", "%20")
     url = f"https://api.spotify.com/v1/search?q={track_name}&type=track&limit=1"
     result = requests.get(url, headers=get_auth_header(token))
     json_result = json.loads(result.content)
