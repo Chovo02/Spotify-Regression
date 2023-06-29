@@ -47,7 +47,7 @@ df = pd.read_csv("data\\SpotifySongPolularityAPIExtract.csv")
 
 dictionary = {}
 
-with open("data\\feats_url.json") as f:
+with open("data\\feats.json") as f:
     d = json.load(f)
     df = df[~df['track_name'].isin(d)]
 
@@ -58,7 +58,7 @@ with open("data\\feats_url.json") as f:
 
                 dictionary[track] = feats
             except:
-                with open ("data\\feats_url.json","w") as f:
+                with open ("data\\feats.json","w") as f:
                     json.dump(dictionary, f, indent=4)
                 if KeyboardInterrupt:
                     break
