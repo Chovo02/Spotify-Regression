@@ -1,7 +1,5 @@
 import pandas as pd
-from sklearn.model_selection import train_test_split
 import plotly.express as px
-from sklearn.preprocessing import FunctionTransformer
 
 def feat(x):
     if "feat." in x:
