@@ -35,11 +35,14 @@ def get_auth_header(token):
     return {"Authorization": f"Bearer {token}"}
 
 def controlla_proposte_simili(descrizione1,descrizone2):
-    stop_words = stopwords.words('italian')
-    vectorizer = CountVectorizer(stop_words=stop_words)
-    vectorizer.fit([descrizione1,descrizone2])
-    vector = vectorizer.transform([descrizione1,descrizone2])
-    return cosine_similarity(vector)[0][1]
+    try:
+        stop_words = stopwords.words('italian')
+        vectorizer = CountVectorizer(stop_words=stop_words)
+        vectorizer.fit([descrizione1,descrizone2])
+        vector = vectorizer.transform([descrizione1,descrizone2])
+        return cosine_similarity(vector)[0][1]
+    except:
+        return 0
 
 def get_feat(track_name, token,track_id):
     url = f"https://api.spotify.com/v1/search?q={track_name}&type=track&limit=10"
@@ -90,15 +93,18 @@ dictionary = {}
 
 with open("data\\feats.json") as f:
     d = json.load(f)
-    df = df[~df['track_id'].isin(d)]
+    if len(d) > 0:
+        dictionary = d
+        df = df[~df['track_id'].isin(d)]
 
     for track_id,track_name,artist_name in tqdm(zip(df["track_id"], df["track_name"],df["artist_name"]), total=len(df)):
 
         try:
             feats = get_feat(track_name, token, track_id)
             dictionary[track_id] = feats
-        except:
+        except Exception as e:
             with open ("data\\feats.json","w") as f:
                 json.dump(dictionary, f, indent=4)
+            print(e)
             if KeyboardInterrupt:
                 break
