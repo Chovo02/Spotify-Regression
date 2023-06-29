@@ -51,37 +51,12 @@ def get_feat(track_name, token,track_id):
     feat = []
     
     for item in json_result["tracks"]["items"]:
-        
-        if item["id"] == track_id:
-            # print("--------------------------------------------------")
-            # print(controlla_proposte_simili(item["name"].lower(),track_name.lower()), sep="|")
-            # print(item["name"].lower(),track_name.lower(), sep="|")
-            # print(item["artists"][0]["name"].lower(),artist_name.lower(), sep="|")
-            # print("ID")
-            for artist in item["artists"][1:]:
-                feat.append(artist["name"])
-            return feat
-        elif controlla_proposte_simili(item["name"].lower(),track_name.lower())>0.9 and item["artists"][0]["name"].lower() == artist_name.lower():
-            # print("--------------------------------------------------")
-            # print(controlla_proposte_simili(item["name"].lower(),track_name.lower()), sep="|")
-            # print(item["name"].lower(),track_name.lower(), sep="|")
-            # print(item["artists"][0]["name"].lower(),artist_name.lower(), sep="|")
-            # print("SIMILI")
+        if item["id"] == track_id or (controlla_proposte_simili(item["name"].lower(),track_name.lower())>0.9 and item["artists"][0]["name"].lower() == artist_name.lower()):
             for artist in item["artists"][1:]:
                 feat.append(artist["name"])
             return feat
         elif " feat" in track_name.lower() or " (feat" in track_name.lower():
-            # print("--------------------------------------------------")
-            # print(controlla_proposte_simili(item["name"].lower(),track_name.lower()), sep="|")
-            # print(item["name"].lower(),track_name.lower(), sep="|")
-            # print(item["artists"][0]["name"].lower(),artist_name.lower(), sep="|")
-            # print("FEAT")
             return ["feat"]
-    # print("--------------------------------------------------")
-    # print(controlla_proposte_simili(item["name"].lower(),track_name.lower()), sep="|")
-    # print(item["name"].lower(),track_name.lower(), sep="|")
-    # print(item["artists"][0]["name"].lower(),artist_name.lower(), sep="|")
-    # print("VUOTO")
     return feat
 
 token = get_token()
@@ -98,7 +73,6 @@ with open("data\\feats.json") as f:
         df = df[~df['track_id'].isin(d)]
 
     for track_id,track_name,artist_name in tqdm(zip(df["track_id"], df["track_name"],df["artist_name"]), total=len(df)):
-
         try:
             feats = get_feat(track_name, token, track_id)
             dictionary[track_id] = feats
