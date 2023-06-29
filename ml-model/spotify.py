@@ -60,6 +60,17 @@ def get_feat(track_name, token,track_id):
             return ["feat"]
     return feat
 
+def save_data(path:str = "data\\feats.json", data:dict = {}):
+    try:
+        with open(path,"r") as f:
+            current_data = json.load(f)
+        current_data.update(data)
+        with open(path,"w") as f:
+            json.dump(current_data, f, indent=4)
+        return True
+    except:
+        return False
+
 token = get_token()
 
 df = pd.read_csv("data\\SpotifySongPolularityAPIExtract.csv")
@@ -80,8 +91,15 @@ with alive_bar(len(df["track_id"])) as bar:
                 feats = get_feat(track_name, token, track_id)
                 dictionary[track_id] = feats
             except:
-                with open ("data\\feats.json","w") as f:
-                    json.dump(dictionary, f, indent=4)
+                if save_data(data=dictionary):
+                    dictionary = {}
+                else:
+                    break
                 if KeyboardInterrupt:
                     break
+        if len(dictionary.keys()) > 1000:
+            if save_data(data=dictionary):
+                dictionary = {}
+            else:
+                break
         bar()
