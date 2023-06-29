@@ -8,6 +8,7 @@ from tqdm import tqdm
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from nltk.corpus import stopwords
+from alive_progress import alive_bar
 
 dotenv.load_dotenv()
 
@@ -95,16 +96,17 @@ with open("data\\feats.json") as f:
     d = json.load(f)
     if len(d) > 0:
         dictionary = d
-        df = df[~df['track_id'].isin(d)]
+        print(f"Caricati {len(dictionary)} elementi dal file")
 
-    for track_id,track_name,artist_name in tqdm(zip(df["track_id"], df["track_name"],df["artist_name"]), total=len(df)):
-
-        try:
-            feats = get_feat(track_name, token, track_id)
-            dictionary[track_id] = feats
-        except Exception as e:
-            with open ("data\\feats.json","w") as f:
-                json.dump(dictionary, f, indent=4)
-            print(e)
-            if KeyboardInterrupt:
-                break
+with alive_bar(len(df["track_id"])) as bar:
+    for track_id,track_name,artist_name in zip(df["track_id"], df["track_name"],df["artist_name"]):
+        if track_id not in dictionary.keys():
+            try:
+                feats = get_feat(track_name, token, track_id)
+                dictionary[track_id] = feats
+            except:
+                with open ("data\\feats.json","w") as f:
+                    json.dump(dictionary, f, indent=4)
+                if KeyboardInterrupt:
+                    break
+        bar()
