@@ -94,13 +94,14 @@ with alive_bar(len(df["track_id"])) as bar:
             try:
                 feats = get_feat(track_name, token, track_id)
                 dictionary[track_id] = feats
-            except:
+            except KeyboardInterrupt:
                 if save_data(data=dictionary):
                     dictionary = {}
-                else:
-                    break
-                if KeyboardInterrupt:
-                    break
+                break
+            except Exception as e:
+                print(e)
+                if save_data(data=dictionary):
+                    dictionary = {}
         if i%100 == 0:
             i=0
             if save_data(data=dictionary):
