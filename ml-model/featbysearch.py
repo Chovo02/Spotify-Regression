@@ -4,7 +4,6 @@ import json
 import dotenv
 import os
 import pandas as pd
-from tqdm import tqdm
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from nltk.corpus import stopwords
@@ -12,10 +11,9 @@ from alive_progress import alive_bar
 
 dotenv.load_dotenv()
 
-client_id = os.getenv("SPOTIFY_CLIENT_ID")
-client_secret = os.getenv("SPOTIFY_CLIENT_SECRET")
-
 def get_token():
+    client_id = os.getenv("SPOTIFY_CLIENT_ID")
+    client_secret = os.getenv("SPOTIFY_CLIENT_SECRET")
     auth_string = f"{client_id}:{client_secret}"
     auth_bytes = auth_string.encode("utf-8")
     auth_base64 = str(base64.b64encode(auth_bytes), "utf-8")
@@ -37,7 +35,7 @@ def get_auth_header(token):
 
 def controlla_proposte_simili(descrizione1,descrizone2):
     try:
-        stop_words = stopwords.words('italian')
+        stop_words = stopwords.words('english')
         vectorizer = CountVectorizer(stop_words=stop_words)
         vectorizer.fit([descrizione1,descrizone2])
         vector = vectorizer.transform([descrizione1,descrizone2])
@@ -72,9 +70,6 @@ def save_data(path:str = "data\\feats.json", data:dict = {}):
         print(e)
         return False
     
-
-token = get_token()
-
 df = pd.read_csv("data\\SpotifySongPolularityAPIExtract.csv")
 df.drop_duplicates(subset=['track_id'], keep='first', inplace=True)
 
@@ -92,7 +87,7 @@ with alive_bar(len(df["track_id"])) as bar:
         i += 1
         if track_id not in d.keys():
             try:
-                feats = get_feat(track_name, token, track_id)
+                feats = get_feat(track_name, get_token(),track_id)
                 dictionary[track_id] = feats
             except KeyboardInterrupt:
                 if save_data(data=dictionary):
