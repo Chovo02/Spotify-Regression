@@ -51,8 +51,8 @@ current_connection = 0
 connections = get_connections()
 with alive_bar(len(df["track_id"])) as bar:
     for track_id,track_name,artist_name in zip(df["track_id"], df["track_name"],df["artist_name"]):
-        i += 1
         if track_id not in d.keys():
+            i += 1
             try:
                 feats = get_feats_tekkore(track_id,current_connection,connections)
                 dictionary[track_id] = feats[1:]
@@ -68,10 +68,10 @@ with alive_bar(len(df["track_id"])) as bar:
                 print(e)
                 if save_data(data=dictionary):
                     dictionary = {}
-        if i%100 == 0:
-            i=0
-            if save_data(data=dictionary):
-                dictionary = {}
-            else:
-                break
+            if i%1000 == 0 or track_id == df["track_id"].iloc[-1]:
+                print(i)
+                if save_data(data=dictionary):
+                    dictionary = {}
+                else:
+                    break
         bar()
