@@ -35,43 +35,47 @@ def get_feats_tekkore(track_id,current_connection,connections):
         feat.append(artist.name)
     return feat
 
-df = pd.read_csv("data\\SpotifySongPolularityAPIExtract.csv")
-df.drop_duplicates(subset=['track_id'], keep='first', inplace=True)
+def feat_dict(df):
+    df.drop_duplicates(subset=['track_id'], keep='first', inplace=True)
 
-dictionary = {}
+    dictionary = {}
 
-with open("data\\feats.json") as f:
-    d = json.load(f)
-    if len(d) > 0:
-        dictionary = d
-        print(f"Caricati {len(dictionary)} elementi dal file")
+    with open("data\\feats.json") as f:
+        d = json.load(f)
+        if len(d) > 0:
+            dictionary = d
+            print(f"Caricati {len(dictionary)} elementi dal file")
+        elif len(d) == len(df.index):
+            print("Tutti gli elementi sono stati caricati")
+            return d
 
-i=0
-current_connection = 0
-connections = get_connections()
-with alive_bar(len(df["track_id"])) as bar:
-    for track_id,track_name,artist_name in zip(df["track_id"], df["track_name"],df["artist_name"]):
-        if track_id not in d.keys():
-            i += 1
-            try:
-                feats = get_feats_tekkore(track_id,current_connection,connections)
-                dictionary[track_id] = feats[1:]
-                if current_connection == len(connections)-1:
-                    current_connection = 0
-                else:
-                    current_connection += 1
-            except KeyboardInterrupt:
-                if save_data(data=dictionary):
-                    dictionary = {}
-                break
-            except Exception as e:
-                print(e)
-                if save_data(data=dictionary):
-                    dictionary = {}
-            if i%1000 == 0 or track_id == df["track_id"].iloc[-1]:
-                print(i)
-                if save_data(data=dictionary):
-                    dictionary = {}
-                else:
+    i=0
+    connections = get_connections()
+    with alive_bar(len(df["track_id"])) as bar:
+        for track_id in df["track_id"]:
+            if track_id not in d.keys():
+                i += 1
+                try:
+                    feats = get_feats_tekkore(track_id,i%len(connections),connections)
+                    dictionary[track_id] = feats[1:]
+                except KeyboardInterrupt:
+                    if save_data(data=dictionary):
+                        dictionary = {}
                     break
-        bar()
+                except Exception as e:
+                    print(e)
+                    if save_data(data=dictionary):
+                        dictionary = {}
+                    else:
+                        raise Exception("Errore salvataggio file")
+                if i%1000 == 0:
+                    if save_data(data=dictionary):
+                        dictionary = {}
+                    else:
+                        raise Exception("Errore salvataggio file")
+            bar()
+        if i != 0:
+            save_data(data=dictionary)
+    with open("data\\feats.json") as f:
+        d = json.load(f)
+    return d
