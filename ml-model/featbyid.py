@@ -1,7 +1,6 @@
 import json
 import dotenv
 import os
-import pandas as pd
 from alive_progress import alive_bar
 import tekore as tk
 
@@ -42,12 +41,12 @@ def feat_dict(df):
 
     with open("data\\feats.json") as f:
         d = json.load(f)
+        if len(d) == len(df.index):
+            print("Tutti gli elementi sono stati caricati")
+            return d
         if len(d) > 0:
             dictionary = d
             print(f"Caricati {len(dictionary)} elementi dal file")
-        elif len(d) == len(df.index):
-            print("Tutti gli elementi sono stati caricati")
-            return d
 
     i=0
     connections = get_connections()
