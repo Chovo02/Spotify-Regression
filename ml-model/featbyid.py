@@ -9,10 +9,7 @@ dotenv.load_dotenv()
 def get_connections():
     client_ids = os.environ['CLIENT_ID_LIST'].split(",")
     client_secrets = os.environ['CLIENT_SECRET_LIST'].split(",")
-    connections = []
-    for client_id, client_secret in zip(client_ids, client_secrets):
-        connections.append(tk.Spotify(tk.request_client_token(client_id, client_secret)))
-    return connections
+    return [tk.Spotify(tk.request_client_token(client_id, client_secret)) for client_id, client_secret in zip(client_ids, client_secrets)]
 
 def save_data(path:str = "data\\feats.json", data:dict = {}):
     try:
@@ -26,13 +23,10 @@ def save_data(path:str = "data\\feats.json", data:dict = {}):
         print(e)
         return False
     
-def get_feats_tekkore(track_id,current_connection,connections):
-    feat = []
+def get_feats_tekkore(track_id, current_connection, connections):
     connection = connections[current_connection]
     result = connection.track(track_id).artists
-    for artist in result:
-        feat.append(artist.name)
-    return feat
+    return [artist.name for artist in result]
 
 def feat_dict(df):
     df.drop_duplicates(subset=['track_id'], keep='first', inplace=True)
