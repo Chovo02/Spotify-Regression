@@ -1,5 +1,7 @@
 from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.pipeline import Pipeline
 from featbyid import feat_dict
+import pandas as pd
 
 class FeatTransformer(BaseEstimator, TransformerMixin):
         
@@ -8,7 +10,7 @@ class FeatTransformer(BaseEstimator, TransformerMixin):
         self._y = y
     
     def transform(self, X, y=None):
-        X["popularity"] = self
+        X["popularity"] = self._y
         avg_popularity = X.groupby("artist_name")["popularity"].mean().to_dict()
         feats_averaged = {}
 
