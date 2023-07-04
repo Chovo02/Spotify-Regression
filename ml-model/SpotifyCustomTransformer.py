@@ -2,6 +2,9 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from featbyid import feat_dict
 
 class FeatTransformer(BaseEstimator, TransformerMixin):
+    def __init__(self, verbose:int = 1) -> None:
+        self._verbose = verbose
+
     def fit(self, X, y=None):
         self._y = y
         X["popularity"] = self._y
@@ -11,7 +14,7 @@ class FeatTransformer(BaseEstimator, TransformerMixin):
     
     def transform(self, X, y=None):
         X["popularity"] = self._y
-        self._feat = feat_dict(X)
+        self._feat = feat_dict(X, self._verbose)
         market_list = {}
         feats_averaged = {}
         for key, items in self._feat.items():
