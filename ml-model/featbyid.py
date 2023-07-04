@@ -52,6 +52,33 @@ def load_json(X:pd.DataFrame, verbose:int = 1, path:str = get_env("JSON_PATH")):
                 print("Nessun dato presente, inizio caricamento")
         return d, False
     
+def feat_by_id_bar(X:pd.DataFrame, json_file:dict):
+    i=0
+    dictionary = {}
+    connections = get_connections()
+    with alive_bar(len(X["track_id"])) as bar:
+        for track_id in X["track_id"]:
+            if track_id not in json_file.keys():
+                i += 1
+                try:
+                    feats,markets = get_feats_tekkore(track_id,i%len(connections),connections)
+                    dictionary[track_id] = {"feats":
+                        feats[1:],
+                        "markets":markets}
+                except KeyboardInterrupt:
+                    save_data(data=dictionary)
+                    dictionary = {}
+                    break
+                except Exception as e:
+                    print(e)
+                    save_data(data=dictionary)
+                    dictionary = {}
+                if i%1000 == 0:
+                    save_data(data=dictionary)
+                    dictionary = {}
+            bar()
+    save_data(data=dictionary)
+
 def feat_by_id(X:pd.DataFrame, json_file:dict):
     i=0
     dictionary = {}
@@ -78,6 +105,7 @@ def feat_by_id(X:pd.DataFrame, json_file:dict):
                 dictionary = {}
     save_data(data=dictionary)
 
+
 def feat_dict(X:pd.DataFrame, verbose:int = 1, path:str = get_env("JSON_PATH")):
 
     json_file, all_fill = load_json(X, verbose, path)
@@ -87,9 +115,8 @@ def feat_dict(X:pd.DataFrame, verbose:int = 1, path:str = get_env("JSON_PATH")):
     if verbose == 0:
         feat_by_id(X, json_file)
     else:
-        with alive_bar(len(X["track_id"])) as bar:
-            feat_by_id(X, json_file)
-            bar()
+        feat_by_id_bar(X, json_file)
+
 
    
     with open(get_env("JSON_PATH")) as f:
