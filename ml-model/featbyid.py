@@ -25,8 +25,10 @@ def save_data(path:str = "data\\feats.json", data:dict = {}):
     
 def get_feats_tekkore(track_id, current_connection, connections):
     connection = connections[current_connection]
-    result = connection.track(track_id).artists
-    return [artist.name for artist in result]
+    result = connection.track(track_id)
+    artists = result.artists
+    markets = result.available_markets
+    return [artist.name for artist in artists],0 if len(markets) == 0 else 1
 
 def feat_dict(df):
     df.drop_duplicates(subset=['track_id'], keep='first', inplace=True)
@@ -35,12 +37,19 @@ def feat_dict(df):
 
     with open("data\\feats.json") as f:
         d = json.load(f)
-        if len(d) == len(df.index):
-            print("Tutti gli elementi sono stati caricati")
+        not_present = df[df["track_id"].apply(lambda x: x not in d.keys())]
+        not_present.drop_duplicates(subset=['track_id'], keep='first', inplace=True)
+
+        if not_present.shape[0] == 0:
+            print("Tutte le canozni sono già in cache")
             return d
-        if len(d) > 0:
-            dictionary = d
-            print(f"Caricati {len(dictionary)} elementi dal file")
+        elif not_present.shape[0] != df.shape[0]:
+            print(f"Caricati {df.shape[0]-not_present.shape[0]} canzoni ")
+        else:
+            print("Nessun dato presente, inizio caricamento")
+
+
+
 
     i=0
     connections = get_connections()
@@ -49,8 +58,10 @@ def feat_dict(df):
             if track_id not in d.keys():
                 i += 1
                 try:
-                    feats = get_feats_tekkore(track_id,i%len(connections),connections)
-                    dictionary[track_id] = feats[1:]
+                    feats,markets = get_feats_tekkore(track_id,i%len(connections),connections)
+                    dictionary[track_id] = {"feats":
+                        feats[1:],
+                        "markets":markets}
                 except KeyboardInterrupt:
                     if save_data(data=dictionary):
                         dictionary = {}
