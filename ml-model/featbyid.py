@@ -43,17 +43,18 @@ def load_json(X:pd.DataFrame, verbose:int = 1, path:str = get_env("JSON_PATH")):
         if not_present.shape[0] == 0:
             if verbose == 1:
                 print("Tutte le canozni sono già in cache")
-            return d
+            return d, True
         elif not_present.shape[0] != X.shape[0]:
             if verbose == 1:
                 print(f"Caricati {X.shape[0]-not_present.shape[0]} canzoni ")
         else:
             if verbose == 1:
                 print("Nessun dato presente, inizio caricamento")
-        return None
+        return d, False
     
 def feat_by_id(X:pd.DataFrame, json_file:dict):
     i=0
+    dictionary = {}
     connections = get_connections()
     for track_id in X["track_id"]:
         if track_id not in json_file.keys():
@@ -77,12 +78,10 @@ def feat_by_id(X:pd.DataFrame, json_file:dict):
                 dictionary = {}
     save_data(data=dictionary)
 
-
 def feat_dict(X:pd.DataFrame, verbose:int = 1, path:str = get_env("JSON_PATH")):
-    dictionary = {}
 
-    json_file = load_json(X, verbose, path)
-    if json_file is not None:
+    json_file, all_fill = load_json(X, verbose, path)
+    if all_fill:
         return json_file
 
     if verbose == 0:
@@ -93,7 +92,6 @@ def feat_dict(X:pd.DataFrame, verbose:int = 1, path:str = get_env("JSON_PATH")):
             bar()
 
    
-    save_data(data=dictionary)
     with open(get_env("JSON_PATH")) as f:
         d = json.load(f)
     return d
