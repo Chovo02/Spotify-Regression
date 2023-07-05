@@ -84,8 +84,8 @@ def objective(trial):
 dotenv.load_dotenv()
 
 study = optuna.create_study(storage=os.getenv("MY_SQL_CONNECTION"),
-                            study_name="Random Forest Regressor Optimization with Feat Feature (R2)",
-                            direction="minimize",
+                            study_name="Random Forest Regressor with Feat (R2)",
+                            direction="maximize",
                             load_if_exists=True)
 
 study.optimize(objective, n_jobs=-1)
