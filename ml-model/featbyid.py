@@ -41,14 +41,14 @@ def load_json(X:pd.DataFrame, verbose:int = 1, path:str = get_env("JSON_PATH")):
 
         if not_present.shape[0] == 0:
             if verbose == 1:
-                print("Tutte le canozni sono già in cache")
+                print("Tutte le canozni sono già presenti in cache")
             return d, True
         elif not_present.shape[0] != X.shape[0]:
             if verbose == 1:
-                print(f"Caricati {X.shape[0]-not_present.shape[0]} canzoni ")
+                print(f"Caricate {X.shape[0]-not_present.shape[0]} canzoni dalla cache, inizio caricamento delle restanti")
         else:
             if verbose == 1:
-                print("Nessun dato presente, inizio caricamento")
+                print("Nessuna canzone presente in cache, inizio caricamento")
         return d, False
     
 def feat_by_id_bar(X:pd.DataFrame, json_file:dict):
