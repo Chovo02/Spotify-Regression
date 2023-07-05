@@ -7,11 +7,11 @@ from sklearn.pipeline import Pipeline
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import StandardScaler
-from sklearn.svm import LinearSVR
 import optuna
 import dotenv
 import os
 from sklearn.impute import SimpleImputer
+from sklearn.svm import LinearSVR
 
 df = pd.read_csv("data\\SpotifySongPolularityAPIExtract.csv")
 df.drop_duplicates(subset=['track_id'], keep='first', inplace=True)
@@ -22,14 +22,13 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 
 def f(with_mean,
       with_std,
-      epsilon,
+       epsilon,
       tol,
       max_iter,
       strategy
       ):
     
     pipeline = Pipeline([
-    ("feat_transformer", FeatTransformer(verbose=0)),
     ("artist_popularity_transformer", ArtistPopularityTransformer()),
     ("standard_scaler", StandardScaler(with_mean=with_mean, with_std=with_std)),
     ("imputer", SimpleImputer(strategy=strategy)),  
@@ -40,31 +39,31 @@ def f(with_mean,
         X=X_train,
         y=y_train,
         cv=5,
-        scoring="neg_mean_absolute_error"
+        scoring="neg_mean_squared_error"
     ))
 
 def objective(trial):
     with_mean = trial.suggest_categorical("with_mean", [True, False])
     with_std = trial.suggest_categorical("with_std", [True, False])
-    
-    strategy = trial.suggest_categorical("strategy", ["mean", "median", "most_frequent"])
     epsilon = trial.suggest_float("epsilon", 0.0, 1.0)
-    tol = trial.suggest_float("tol", 0.0, 1.0)
-    max_iter = trial.suggest_int("max_iter", 100, 1000)
+    strategy = trial.suggest_categorical("strategy", ["mean", "median", "most_frequent"])
+    tol=trial.suggest_float("tol", 0.0, 1.0)
+    max_iter=trial.suggest_int("max_iter", 100, 1000)
+
     return f(
         with_mean=with_mean,
         with_std=with_std,
-        strategy=strategy,
         epsilon=epsilon,
         tol=tol,
-        max_iter=1000
+        max_iter=max_iter,
+        strategy=strategy
       )
 
 
 dotenv.load_dotenv()
 
 study = optuna.create_study(storage=os.getenv("MY_SQL_CONNECTION"),
-                            study_name="Linear SVR with feat (MAE)",
+                            study_name="Linear SVR (MSE)",
                             direction="maximize",
                             load_if_exists=True)
 
