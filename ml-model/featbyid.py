@@ -38,7 +38,6 @@ def load_json(X:pd.DataFrame, verbose:int = 1, path:str = get_env("JSON_PATH")):
     with open(path) as f:
         d = json.load(f)
         not_present = X[X["track_id"].apply(lambda x: x not in d.keys())]
-        not_present.drop_duplicates(subset=['track_id'], keep='first', inplace=True)
 
         if not_present.shape[0] == 0:
             if verbose == 1:

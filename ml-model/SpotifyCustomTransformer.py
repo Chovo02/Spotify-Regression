@@ -3,22 +3,22 @@ from featbyid import feat_dict
 
 class FeatTransformer(BaseEstimator, TransformerMixin):
     def __init__(self, verbose:int = 1) -> None:
-        self._verbose = verbose
+        self.verbose = verbose
 
     def fit(self, X, y=None):
-        self._y = y
-        X["popularity"] = self._y
-        self._avg_popularity = X.groupby("artist_name")["popularity"].mean().to_dict()
+        self.y = y
+        X["popularity"] = self.y
+        self.avg_popularity = X.groupby("artist_name")["popularity"].mean().to_dict()
         X.drop("popularity", axis=1, inplace=True)
         return self
     
     def transform(self, X, y=None):
-        X["popularity"] = self._y
-        self._feat = feat_dict(X, self._verbose)
+        X["popularity"] = self.y
+        self.feat = feat_dict(X, self.verbose)
         market_list = {}
         feats_averaged = {}
-        for key, items in self._feat.items():
-            pop_list = [self._avg_popularity.get(artist, 0) for artist in items["feats"]]
+        for key, items in self.feat.items():
+            pop_list = [self.avg_popularity.get(artist, 0) for artist in items["feats"]]
             feats_averaged[key] = sum(pop_list) / len(pop_list) if pop_list else 0
             market_list[key] = items["markets"]
         X["feats_avg_popularity"] = X["track_id"].map(feats_averaged)
@@ -33,14 +33,14 @@ class FeatTransformer(BaseEstimator, TransformerMixin):
 class ArtistPopularityTransformer(BaseEstimator, TransformerMixin):
         
     def fit(self, X, y=None):
-        self._y = y
-        X["popularity"] = self._y
-        self._avg_popularity = X.groupby("artist_name")["popularity"].mean().to_dict()
+        self.y = y
+        X["popularity"] = self.y
+        self.avg_popularity = X.groupby("artist_name")["popularity"].mean().to_dict()
         X.drop("popularity", axis=1, inplace=True)
         return self
 
     def transform(self, X, y=None):
-        X["artist_name"] = X["artist_name"].map(self._avg_popularity)
+        X["artist_name"] = X["artist_name"].map(self.avg_popularity)
         X = X.drop(["track_id", "track_name"], axis=1)
         return X
     
