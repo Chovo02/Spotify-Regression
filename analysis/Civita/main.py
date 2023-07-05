@@ -17,7 +17,7 @@ df_matrix = df.drop(["track_id", "track_name", "artist_name"], axis=1)
 px.scatter_matrix(df_matrix.sample(1000)).show()
 
 df.sort_values("artist_name", ascending=False, inplace=True)
-name_dict={}
+name_dict = {}
 for i, name in enumerate(df["artist_name"].unique()):
     name_dict[name] = i
 
