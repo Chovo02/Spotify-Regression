@@ -45,7 +45,7 @@ def objective(trial):
     with_std = trial.suggest_categorical("with_std", [True, False])
     fit_intercept = trial.suggest_categorical("fit_intercept", [True, False])
     strategy = trial.suggest_categorical("strategy", ["mean", "median", "most_frequent"])
-    alpha = trial.suggest_float("alpha", 0, 10)
+    alpha = trial.suggest_float("alpha", 0, 25)
 
     return f(
         with_mean=with_mean,
