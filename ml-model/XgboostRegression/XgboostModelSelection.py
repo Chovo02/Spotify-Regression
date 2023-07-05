@@ -112,8 +112,7 @@ def f(with_mean,
                 validate_parameters=validate_parameters
             ))
         ])
-    print(pipeline) 
-    print(f"Scoring metric used: {score_type}") 
+
 
     return np.mean(cross_val_score(
         estimator=pipeline,
