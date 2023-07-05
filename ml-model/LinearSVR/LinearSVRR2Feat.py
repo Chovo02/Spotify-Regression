@@ -63,7 +63,7 @@ def objective(trial):
 dotenv.load_dotenv()
 
 study = optuna.create_study(storage=os.getenv("MY_SQL_CONNECTION"),
-                            study_name="Linear SVR (R2)",
+                            study_name="Linear SVR with feat (R2)",
                             direction="maximize",
                             load_if_exists=True)
 
