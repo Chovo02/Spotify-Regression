@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import sys
 sys.path.append("ml-model")
-from SpotifyCustomTransformer import FeatTransformer, ArtistPopularityTransformer
+from SpotifyCustomTransformer import ArtistPopularityTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.ensemble import RandomForestRegressor
@@ -33,7 +33,6 @@ def f(with_mean,
       ):
     
     pipeline = Pipeline([
-    ("feat_transformer", FeatTransformer(verbose=0)),
     ("artist_popularity_transformer", ArtistPopularityTransformer()),
     ("standard_scaler", StandardScaler(with_mean=with_mean, with_std=with_std)),
     ("imputer", SimpleImputer(strategy="median")),
@@ -86,7 +85,7 @@ def objective(trial):
 dotenv.load_dotenv()
 
 study = optuna.create_study(storage=os.getenv("MY_SQL_CONNECTION"),
-                            study_name="Random Forest Regressor with Feat (R2)",
+                            study_name="Random Forest Regressor (R2)",
                             direction="maximize",
                             load_if_exists=True)
 

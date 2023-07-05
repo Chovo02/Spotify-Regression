@@ -53,7 +53,7 @@ def f(with_mean,
         X=X_train,
         y=y_train,
         cv=5,
-        scoring="r2"
+        scoring="neg_mean_squared_error"
     ))
 
 def objective(trial):
@@ -86,7 +86,7 @@ def objective(trial):
 dotenv.load_dotenv()
 
 study = optuna.create_study(storage=os.getenv("MY_SQL_CONNECTION"),
-                            study_name="Random Forest Regressor with Feat (R2)",
+                            study_name="Random Forest Regressor with Feat (MSE)",
                             direction="maximize",
                             load_if_exists=True)
 
