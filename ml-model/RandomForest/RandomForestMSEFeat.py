@@ -21,6 +21,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 
 def f(with_mean,
       with_std,
+      strategy,
       n_estimators,
       criterion,
       max_depth,
@@ -36,7 +37,7 @@ def f(with_mean,
     ("feat_transformer", FeatTransformer(verbose=0)),
     ("artist_popularity_transformer", ArtistPopularityTransformer()),
     ("standard_scaler", StandardScaler(with_mean=with_mean, with_std=with_std)),
-    ("imputer", SimpleImputer(strategy="median")),
+    ("imputer", SimpleImputer(strategy=strategy)),
     ("random_forest_regressor", RandomForestRegressor(n_estimators=n_estimators, 
                                                       criterion=criterion, 
                                                       max_depth=max_depth, 
@@ -60,6 +61,8 @@ def objective(trial):
     with_mean = trial.suggest_categorical("with_mean", [True, False])
     with_std = trial.suggest_categorical("with_std", [True, False])
 
+    strategy = trial.suggest_categorical("strategy", ["mean", "median", "most_frequent"])
+
     n_estimators = trial.suggest_int("n_estimators", 100, 10000)
     criterion = trial.suggest_categorical("criterion", ["squared_error", "friedman_mse", "poisson"])
     max_depth = trial.suggest_int("max_depth", 10, 300)
@@ -71,6 +74,7 @@ def objective(trial):
     bootstrap = trial.suggest_categorical("bootstrap", [True, False])
     return f(with_mean,
       with_std,
+      strategy,
       n_estimators,
       criterion,
       max_depth,

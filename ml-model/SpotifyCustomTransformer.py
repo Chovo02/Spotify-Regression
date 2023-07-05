@@ -2,7 +2,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from featbyid import feat_dict
 
 class FeatTransformer(BaseEstimator, TransformerMixin):
-    def __init__(self, verbose:int = 1) -> None:
+    def __init__(self, verbose:int = 0) -> None:
         self.verbose = verbose
 
     def fit(self, X, y=None):
