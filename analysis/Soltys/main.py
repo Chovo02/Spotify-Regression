@@ -16,11 +16,11 @@ df.drop("popularity",axis= 1, inplace=True)
 
 
 X_train, X_test, y_train, y_test = train_test_split(df, df_target, test_size=0.2, random_state=42)
-#print(X_train)
+# print(X_train)
 # X train lavoro
 X_train["popularity"] = y_train
-# df_nuovo = X_train.groupby("artist_name")["popularity"].mean()
-# X_train["singola_popolarita"] = X_train["artist_name"].map(df_nuovo)
+df_nuovo = X_train.groupby("artist_name")["popularity"].mean()
+X_train["singola_popolarita"] = X_train["artist_name"].map(df_nuovo)
 X_train.drop(["track_id", "track_name", "artist_name", "popularity"], axis=1, inplace=True)
 #print(X_train)
 
@@ -28,8 +28,9 @@ X_train.drop(["track_id", "track_name", "artist_name", "popularity"], axis=1, in
 # X test
 
 X_test["popularity"] = y_test
-# df_nuovo = X_test.groupby("artist_name")["popularity"].mean()
-# X_test["singola_popolarita"] = X_test["artist_name"].map(df_nuovo)
+#df_nuovo = X_test.groupby("artist_name")["popularity"].mean()
+X_test["singola_popolarita"] = X_test["artist_name"].map(df_nuovo)
+X_test["singola_popolarita"].fillna(df_nuovo.mean(), inplace=True)
 X_test.drop(["track_id", "track_name", "artist_name", "popularity"], axis=1, inplace=True)
 
 
