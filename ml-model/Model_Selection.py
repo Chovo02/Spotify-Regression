@@ -130,6 +130,9 @@ def objective(trial, model, score_type, with_feat):
             penalty=penalty,
             alpha=alpha,
             l1_ratio=l1_ratio,
+            fit_intercept=fit_intercept,
+            max_iter=max_iter,
+            tol=tol,
             score_type=score_type,
             with_feat=with_feat)
     elif model == "xgb":
