@@ -22,8 +22,5 @@ def DataPreProcessing(df):
     percentile_66 = df["tempo"].quantile(0.66)
 
     df["tempo"] = df["tempo"].apply(lambda x: tempo_classifier(x))
-    keywords = ["podcast", "mix", "rain", "intro", "outro", "dj", "sleep"]
-    mask = df['track_name'].str.lower().str.contains('|'.join(keywords))
-    df = df[~mask]
     df.drop(["mode", "key", "time_signature"], axis=1, inplace=True)
     return df
