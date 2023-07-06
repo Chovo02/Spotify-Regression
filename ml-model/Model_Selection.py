@@ -86,6 +86,7 @@ def objective(trial, model, score_type, with_feat):
         max_leaf_nodes = trial.suggest_int("max_leaf_nodes", 10, 300)
         bootstrap = trial.suggest_categorical("bootstrap", [True, False])
         return f(
+            model=model,
             with_mean=with_mean,
             with_std=with_std,
             strategy=strategy,
@@ -104,6 +105,7 @@ def objective(trial, model, score_type, with_feat):
         alpha = trial.suggest_float("alpha", 0 , 25)
         fit_intercept = trial.suggest_categorical("fit_intercept", [True, False])
         return f(
+            model=model,
             with_mean=with_mean,
             with_std=with_std,
             strategy=strategy,
@@ -120,6 +122,7 @@ def objective(trial, model, score_type, with_feat):
         max_iter = trial.suggest_int("max_iter", 100, 2000)
         tol = trial.suggest_float("tol", 1e-8, 1e-1, log=True)
         return f(
+            model=model,
             with_mean=with_mean,
             with_std=with_std,
             strategy=strategy,
@@ -142,6 +145,7 @@ def objective(trial, model, score_type, with_feat):
         num_parallel_tree = trial.suggest_int("num_parallel_tree", 1, 10, step=1)
         tree_method = trial.suggest_categorical("tree_method", ["auto", "exact", "approx", "hist"])
         return f(
+            model=model,
             with_mean=with_mean,
             with_std=with_std,
             strategy=strategy,
