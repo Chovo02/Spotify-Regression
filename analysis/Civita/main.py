@@ -8,6 +8,8 @@ def feat(x):
         return False
 
 df = pd.read_csv("data/SpotifySongPolularityAPIExtract.csv", low_memory=False)
+df.drop_duplicates(subset=['track_id'], keep='first', inplace=True)
+df.dropna(inplace=True)
 
 def matrix(df):
     df["feat"] = df["track_name"].apply(lambda x: feat(x))
@@ -17,10 +19,6 @@ def matrix(df):
 
 def artist_scatter(df):
     df.sort_values("artist_name", ascending=False, inplace=True)
-    name_dict={}
-    for i, name in enumerate(df["artist_name"].unique()):
-        name_dict[name] = i
 
     df_artist_scatter = df
-    df_artist_scatter["artist_name"] = df_artist_scatter["artist_name"].map(name_dict)
-    px.scatter(df_artist_scatter, x="artist_name", y="popularity", color="feat").show()
+    px.scatter(df_artist_scatter, x="artist_name", y="popularity").show()
