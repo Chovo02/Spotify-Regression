@@ -18,27 +18,16 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import Ridge
 from sklearn.linear_model import SGDRegressor
 from xgboost import XGBRegressor
-from sklearn.metrics import mean_absolute_error
-
+from SpotifyPreProcessing import DataPreProcessing
+sys.path.append("ml-model")
+dotenv.load_dotenv()
 
 df = pd.read_csv("data\\SpotifySongPolularityAPIExtract.csv")
-df.drop_duplicates(subset=['track_id'], keep='first', inplace=True)
-df.dropna(inplace=True)
+df = DataPreProcessing(df)
 
-keywords = ["podcast", "mix", "rain", "intro", "outro", "dj", "sleep"]
-mask = df['track_name'].str.lower().str.contains('|'.join(keywords))
-df = df[~mask]
-
-df = df[df["time_signature"] != 0]
-df = df[df["tempo"] != 0]
-
-X = df.drop(["popularity","mode","key","time_signature","tempo"], axis=1)
+X = df.drop(["popularity"], axis=1)
 y = df["popularity"]
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-sys.path.append("ml-model")
-
-dotenv.load_dotenv()
 
 def get_best_pipeline(model_name, best_params, with_feat):
     MODELS = {
@@ -74,20 +63,15 @@ def get_best_pipeline(model_name, best_params, with_feat):
 
 def export_model(model,score_type, with_feat):
     dotenv.load_dotenv()
-    if model == "linear":
-          model_name = "Linear Regression"
-    elif model == "lasso":
-            model_name = "Lasso Regression"
-    elif model == "svr":
-            model_name = "Linear SVR"
-    elif model == "rf":
-            model_name = "Random Forest Regressor"
-    elif model == "ridge":
-            model_name = "Ridge Regression"
-    elif model == "sgd":
-            model_name = "SGD Regressor"
-    elif model == "xgb":
-            model_name = "XGBoost Regressor"
+    model_name = {
+       "linear": "Linear Regression",
+       "lasso": "Lasso Regression",
+       "svr": "Linear SVR",
+       "rf": "Random Forest Regressor",
+       "ridge": "Ridge Regression",
+       "sgd": "SGD Regressor",
+       "xgb": "XGBoost Regressor"
+    }[model]
 
     if with_feat:
         study_name = f"{model_name} with Feat ({score_type})"
@@ -102,15 +86,18 @@ def export_model(model,score_type, with_feat):
         score_type = "neg_mean_squared_error"
 
     try:
-        study = optuna.load_study(study_name=study_name, storage=os.getenv("MY_SQL_CONNECTION_PROVA"))
+        study = optuna.load_study(study_name=study_name, storage=os.getenv("MY_SQL_CONNECTION"))
     except:
-        print(f"Studio ({study_name}) non trovato su {os.getenv('MY_SQL_CONNECTION_PROVA')}")
+        print(f"Studio ({study_name}) non trovato su {os.getenv('MY_SQL_CONNECTION')}")
         return
 
     best_params = study.best_params
     pipeline = get_best_pipeline(model_name=model, best_params=best_params,with_feat=with_feat)
     pipeline.fit(X_train, y_train)
     study_name=study_name.replace(" ","_")
+    if os.path.isfile(f"data\\{study_name}.sav"):
+        print(f"Modello {study_name} già esportato")
+        return
     pickle.dump(pipeline, open(f"data\\{study_name}.sav", "wb"))
     print(f"Modello {study_name} esportato correttamente")
     
