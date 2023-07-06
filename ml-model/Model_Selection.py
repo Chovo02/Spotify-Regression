@@ -1,4 +1,5 @@
 import argparse
+from argparse import RawTextHelpFormatter
 import pandas as pd
 import numpy as np
 import sys
@@ -19,8 +20,16 @@ from sklearn.linear_model import SGDRegressor
 
 df = pd.read_csv("data\\SpotifySongPolularityAPIExtract.csv")
 df.drop_duplicates(subset=['track_id'], keep='first', inplace=True)
+df.dropna(inplace=True)
 
-X = df.drop(["popularity","mode","key","time_signature"], axis=1)
+keywords = ["podcast", "mix", "rain", "intro", "outro", "dj", "sleep"]
+mask = df['track_name'].str.lower().str.contains('|'.join(keywords))
+df = df[~mask]
+
+df = df[df["time_signature"] != 0]
+df = df[df["tempo"] != 0]
+
+X = df.drop(["popularity","mode","key","time_signature","tempo"], axis=1)
 y = df["popularity"]
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
@@ -394,9 +403,10 @@ def run_study(model,score_type, with_feat):
     study.optimize(lambda trial: objective(trial, model, score_type, with_feat), n_trials=100)
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Model Selection.')
-    parser.add_argument('--model', type=str, required=True, choices=['lasso','linear','svr','rf','ridge','sgd','xgb'], help='Modello da usare')
-    parser.add_argument('--score', type=str, required=True, choices=['R2', 'MAE', 'MSE'], help='Tipo di score da usare')
+    parser = argparse.ArgumentParser(description='Model Selection manager',formatter_class=RawTextHelpFormatter)
+    parser.add_argument('--model', type=str, required=True, choices=['lasso','linear','svr','rf','ridge','sgd','xgb'], 
+                        help="""\nSeleziona il modello da utilizzare\n\n--model lasso: Lasso Regression\n--model linear: Linear Regression\n--model svr: Linear SVR\n--model rf: Random Forest Regressor\n--model ridge: Ridge Regression\n--model sgd: SGD Regressor\n--model xgb: XGBoost Regressor """)
+    parser.add_argument('--score', type=str, required=True, choices=['R2', 'MAE', 'MSE'], help='\nTipo di score da utilizzare\n\n--score R2: R2\n--score MAE: Mean Absolute Error\n--score MSE: Mean Squared Error')
     parser.add_argument('--feat', dest='feat', action='store_true', help='Usa feat transformer')
     parser.add_argument('--nofeat', dest='feat', action='store_false', help='Non usa feat transformer')
     parser.set_defaults(feat=True)
