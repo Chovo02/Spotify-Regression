@@ -404,7 +404,7 @@ def run_study(model,score_type, with_feat):
                                 direction="maximize",
                                 load_if_exists=True)
 
-    study.optimize(lambda trial: objective(trial, model, score_type, with_feat), n_trials=100)
+    study.optimize(lambda trial: objective(trial, model, score_type, with_feat), n_trials=1000,n_jobs=-1)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Model Selection manager',formatter_class=RawTextHelpFormatter)
