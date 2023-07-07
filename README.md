@@ -155,7 +155,7 @@ This command will show you the help page for the test model script, wich will ex
 This project is under license from MIT. For more details, see the [LICENSE](LICENSE.md) file.
 
 
-Made with :heart: by <a href="https://github.com/{{ChovoITS}}" target="_blank">{{Matteo Civita, Mattia Rossini, Davide Soltys, Luca Pugno, Niccolò Ballabio}}</a>
+Made with :heart: by <a href="https://github.com/ChovoITS" target="_blank">{{Matteo Civita, Mattia Rossini, Davide Soltys, Luca Pugno, Niccolò Ballabio}}</a>
 
 &#xa0;
 
