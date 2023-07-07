@@ -32,7 +32,7 @@ def objective(trial, model, score_type, with_feat):
     strategy = trial.suggest_categorical("strategy", ["mean", "median", "most_frequent"])
 
     if model == "lasso":
-        with_alpha = trial.suggest_float("with_alpha", 0.1, 1.0)
+        with_alpha = trial.suggest_float("alpha", 0.1, 1.0)
         fit_intercept = trial.suggest_categorical("fit_intercept", [True, False])
         return f(
             model=model,
