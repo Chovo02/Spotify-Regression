@@ -55,8 +55,8 @@ Feel free to contribute :smile:
 ## :sparkles: Features ##
 
 :heavy_check_mark: Model Selection;\
-:heavy_check_mark: Export_Model;\
-:heavy_check_mark: Try Model;
+:heavy_check_mark: Export a model;\
+:heavy_check_mark: Try Pre Trained Model;
 
 ## :rocket: Technologies ##
 
@@ -108,38 +108,47 @@ CLIENT_SECRET_LIST = "your spotify secret id" can be more than 1, separated by a
 
 JSON_PATH = "path to the json file used as cache for the transformers" if left empty, the default path will be used (data\\feats.json)
 
-
-
-
 # Run the project
 ## Model Selection
+
+This module will start a model selection process, it will try different models and different hyperparameters to find the best model for the dataset
+
+by running the following command you will be able to choose between 7 different models, 2 different transformers methods and 3 different scores
+
+The models will be saved on the database specified in the .env file
+
+For the first run it will probably take a lot of time, as the cache will be empty and you'll need to retrieve all the informations, but once the cache is filled, the process will take a couple of seconds
+
+If you want to see the progress bar you can set the verbosity to 1 as a parameter for the transformer
+
+
 ```bash
 python .\ml-model\Model_Selection.py --help
 ```
-This command will show you the help page for the model selection script, everything is explained there
+This command will show you the help page that will explain how to pass all the parameters to the script
 
 Note: if want the verbose output, you need to add it as parameter to the trasformer
 
 ## Export Model
+
+This module will export take from the database the best parameters of a specified study and it will export it as a pickle file, making it usable by the Test_Model module
+
+The model will be saved in the folder "data" with the name formed as "{model_name}_{with or without feat}_{score}"
 ```bash
 python .\ml-model\Export_Model.py --help
 ```
-This command will show you the help page for the export model script, everything is explained there
-
-The script will save the model in the folder "data" with the name formed as "{model_name}_{with or without feat}_{score}"
-
-The model will be usable by the Test_Model module
+This command will show you the help page for the export model script, wich will explain how to pass all the parameters to the script
 
 ## Try Pre Trained Model
+
+This module will take a model exported with the Export_Model module and will allow you to test it by providing a link to a spotify song
+
+It will then predict the popularity of the song and will show you the result
+
 ```bash
 python .\ml-model\Test_Model.py --help
 ```
-This command will show you the help page for the test model script, everything is explained there
-
-By providing a link of the spotify song, a model exported, the score and the feats feature, the model will predict the popularity of that song and will show you the result
-
-
-
+This command will show you the help page for the test model script, wich will explain how to pass all the parameters to the script
 
 ## :memo: License ##
 
