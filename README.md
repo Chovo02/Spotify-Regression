@@ -46,7 +46,11 @@
 
 ## :dart: About ##
 
-Describe your project
+Spotify-Regression is a project made for a machine learning exam, the goal is, given a dataset containing certain informations about songs from spotify, to create a model that can predict the popularity of a song.
+
+Not only you will be able to train the model, you will also be able to save it locally on your machine and use it to predict the popularity of a song that you choose by providing the link.
+
+Feel free to contribute :smile:
 
 ## :sparkles: Features ##
 
