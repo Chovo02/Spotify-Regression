@@ -97,6 +97,56 @@ def get_feats_tekkore(track_id, current_connection, connections):
     markets = result.available_markets
     return [artist.name for artist in artists],0 if len(markets) == 0 else 1
 
+def get_track_audio_features(track_id, current_connection, connections):
+    '''The function `get_track_audio_features` takes a track ID, a current connection, and a dictionary of
+    connections as input, and returns a list of audio features for that track.
+    
+    Parameters
+    ----------
+    track_id
+        The track ID is a unique identifier for a specific track in the Spotify database. It is used to
+    retrieve information about that track, such as its artists and available markets.
+    current_connection
+        The current_connection parameter is the index of the current connection being used. It is used to
+    access the correct connection object from the connections list.
+    connections
+        The `connections` parameter is a dictionary that contains different Spotify connections. Each
+    connection is identified by a key, and the value is the actual connection object.
+    
+    Returns
+    -------
+        a list of audio features for the given track ID.
+    
+    '''
+    connection = connections[current_connection]
+    result = connection.track_audio_features(track_id)
+    return result
+
+def get_track_popularity(track_id, current_connection, connections):
+    '''The function `get_track_popularity` takes a track ID, a current connection, and a dictionary of
+    connections as input, and returns the popularity of that track.
+    
+    Parameters
+    ----------
+    track_id
+        The track ID is a unique identifier for a specific track in the Spotify database. It is used to
+    retrieve information about that track, such as its artists and available markets.
+    current_connection
+        The current_connection parameter is the index of the current connection being used. It is used to
+    access the correct connection object from the connections list.
+    connections
+        The `connections` parameter is a dictionary that contains different Spotify connections. Each
+    connection is identified by a key, and the value is the actual connection object.
+    
+    Returns
+    -------
+        the popularity of the given track ID.
+    
+    '''
+    connection = connections[current_connection]
+    result = connection.track(track_id)
+    return result.popularity,result.name
+
 def load_json(X:pd.DataFrame, verbose:int = 1, path:str = get_env("JSON_PATH")):
     '''The function `load_json` loads a JSON file and checks if all the track IDs in a given DataFrame are
     present in the JSON file, returning the loaded JSON data and a boolean indicating if all track IDs
@@ -136,6 +186,8 @@ def load_json(X:pd.DataFrame, verbose:int = 1, path:str = get_env("JSON_PATH")):
             if verbose == 1:
                 print("Nessuna canzone presente in cache, inizio caricamento")
         return d, False
+    
+
     
 def feat_by_id_bar(X:pd.DataFrame, json_file:dict):
     '''The function `feat_by_id_bar` takes a DataFrame `X` and a JSON file `json_file` as input, and
